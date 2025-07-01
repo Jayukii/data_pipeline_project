@@ -7,6 +7,9 @@ from models import Base, WeatherRecord
 import os
 from dotenv import load_dotenv
 
+from typing import List
+from schemas import WeatherRecordOut
+
 load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
@@ -43,10 +46,9 @@ def ingest_weather_data(city: str, db: Session = Depends(get_db)):
     return {"status": "Data ingested successfully", "data": cleaned_data}
 
 
-@app.get("/records")
+# FastAPI to serialize the response using WeatherRecordOut
+# Automatically documents the schema in Swagger.
+@app.get("/records", response_model=List[WeatherRecordOut])
 def get_records(db: Session = Depends(get_db)):
-    """
-    Retrieve all stored weather records.
-    """
     records = db.query(WeatherRecord).all()
     return records
